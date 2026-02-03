@@ -14,7 +14,7 @@ An advanced, asynchronous Layer 7 and Direct IP stress testing utility developed
    git clone https://github.com/codewriter42/rootDDoS-vX.git
    cd rootDDoS-vX
    pip install -r requirements.txt
-   playwright install chromium
+   pip install cloudscraper aiohttp
 ```
 Usage
 Run the engine using Python:
