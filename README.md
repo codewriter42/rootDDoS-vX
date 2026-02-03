@@ -11,7 +11,7 @@ An advanced, asynchronous Layer 7 and Direct IP stress testing utility developed
 
 ## Installation
    ```bash
-   git clone [https://github.com/yourusername/rootDDoS-vX.git](https://github.com/yourusername/rootDDoS-vX.git)
+   git clone https://github.com/codewriter42/rootDDoS-vX.git
    cd rootDDoS-vX
    pip install -r requirements.txt
    playwright install chromium
