@@ -10,7 +10,7 @@ def get_valid_tokens_termux(target_url):
     print("\n[SYSTEM] INITIALIZING LIGHTWEIGHT BYPASS ENGINE...")
     try:
         scraper = cloudscraper.create_scraper()
-        # Challenge'ı çözmeye çalış ve session bilgilerini al
+    
         resp = scraper.get(target_url, timeout=10)
         cookie_str = "; ".join([f"{k}={v}" for k, v in resp.cookies.get_dict().items()])
         user_agent = scraper.user_agents.get_default()
